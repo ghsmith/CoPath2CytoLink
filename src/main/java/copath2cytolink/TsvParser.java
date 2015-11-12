@@ -13,11 +13,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -32,16 +33,31 @@ import org.supercsv.prefs.CsvPreference;
  */
 public class TsvParser {
 
+    private static final Logger LOGGER = Logger.getLogger(TsvParser.class.getName());
+
     public static void main(String[] args) throws FileNotFoundException, IOException, PropertyException, JAXBException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         
         ObjectFactory of = new ObjectFactory();
+
+        int tsvFileLineCount;
+        {
+            FileReader tsvFileReader = new FileReader(args[0]);
+            LineNumberReader lnr = new LineNumberReader(tsvFileReader);
+            while(lnr.skip(Long.MAX_VALUE) > 0) {}
+            tsvFileLineCount = lnr.getLineNumber() - 1;
+            tsvFileReader.close();
+        }
         
         ICsvMapReader mapReader = new CsvMapReader(new FileReader(args[0]), CsvPreference.TAB_PREFERENCE);
         final String[] header = mapReader.getHeader(true);
         Map<String, String> tsvMap;
+        int x = 0;
         while((tsvMap = mapReader.read(header)) != null ) {
+            
+            x++;
+            LOGGER.info("processing case " + tsvMap.get("specnum_formatted") + " (" + x + "/" + tsvFileLineCount + ")");
             
             CWS cws = of.createCWS();
             cws.setCase(of.createCWSCase());
