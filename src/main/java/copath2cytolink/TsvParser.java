@@ -37,7 +37,7 @@ public class TsvParser {
 
     public static void main(String[] args) throws FileNotFoundException, IOException, PropertyException, JAXBException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         
         ObjectFactory of = new ObjectFactory();
 
@@ -65,28 +65,8 @@ public class TsvParser {
             cws.getCase().setCaseDetailsSet(of.createCWSCaseCaseDetailsSet());
             {
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("order date");
-                caseDetail.setText(sdf.format(new Date(tsvMap.get("order_date"))));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Date");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("accession date");
-                caseDetail.setText(sdf.format(new Date(tsvMap.get("accession_date"))));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Date");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("last name");
-                caseDetail.setText(tsvMap.get("lastname"));
+                caseDetail.setTitle("Patient name");
+                caseDetail.setText(tsvMap.get("lastname") + ", " + tsvMap.get("firstname") + (tsvMap.get("middlename") != null ? " " + tsvMap.get("middlename") : ""));
                 caseDetail.setType("system");
                 caseDetail.setCtrltype("Text");
                 caseDetail.setEditable("True");
@@ -95,27 +75,7 @@ public class TsvParser {
             }
             {
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("first name");
-                caseDetail.setText(tsvMap.get("firstname"));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("middle name");
-                caseDetail.setText(tsvMap.get("middlename"));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("date of birth");
+                caseDetail.setTitle("Date of birth");
                 caseDetail.setText(sdf.format(new Date(tsvMap.get("date_of_birth"))));
                 caseDetail.setType("system");
                 caseDetail.setCtrltype("Text");
@@ -125,10 +85,20 @@ public class TsvParser {
             }
             {
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("part type name");
+                caseDetail.setTitle("Specimen type");
                 caseDetail.setText(tsvMap.get("part_type_name"));
                 caseDetail.setType("system");
                 caseDetail.setCtrltype("Text");
+                caseDetail.setEditable("True");
+                caseDetail.setMandatory("False");
+                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+            }
+            {
+                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                caseDetail.setTitle("Date");
+                caseDetail.setText(sdf.format(new Date(tsvMap.get("order_date"))));
+                caseDetail.setType("system");
+                caseDetail.setCtrltype("Date");
                 caseDetail.setEditable("True");
                 caseDetail.setMandatory("False");
                 cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
