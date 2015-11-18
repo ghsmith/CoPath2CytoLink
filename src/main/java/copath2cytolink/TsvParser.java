@@ -78,7 +78,7 @@ public class TsvParser {
                 caseDetail.setTitle("Date of birth");
                 caseDetail.setText(sdf.format(new Date(tsvMap.get("date_of_birth"))));
                 caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
+                caseDetail.setCtrltype("Date");
                 caseDetail.setEditable("True");
                 caseDetail.setMandatory("False");
                 cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
@@ -95,10 +95,50 @@ public class TsvParser {
             }
             {
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                caseDetail.setTitle("Referral reason");
+                caseDetail.setText("");
+                caseDetail.setType("system");
+                caseDetail.setCtrltype("Text");
+                caseDetail.setEditable("True");
+                caseDetail.setMandatory("False");
+                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+            }
+            {
+                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                caseDetail.setTitle("Technologist");
+                caseDetail.setText("");
+                caseDetail.setType("system");
+                caseDetail.setCtrltype("Text");
+                caseDetail.setEditable("True");
+                caseDetail.setMandatory("False");
+                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+            }
+            {
+                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
                 caseDetail.setTitle("Date");
                 caseDetail.setText(sdf.format(new Date(tsvMap.get("order_date"))));
                 caseDetail.setType("system");
                 caseDetail.setCtrltype("Date");
+                caseDetail.setEditable("True");
+                caseDetail.setMandatory("False");
+                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+            }
+            {
+                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                caseDetail.setTitle("Case comment");
+                caseDetail.setText("");
+                caseDetail.setType("system");
+                caseDetail.setCtrltype("Text");
+                caseDetail.setEditable("True");
+                caseDetail.setMandatory("False");
+                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+            }
+            {
+                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                caseDetail.setTitle("Result");
+                caseDetail.setText("");
+                caseDetail.setType("system");
+                caseDetail.setCtrltype("Text");
                 caseDetail.setEditable("True");
                 caseDetail.setMandatory("False");
                 cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
