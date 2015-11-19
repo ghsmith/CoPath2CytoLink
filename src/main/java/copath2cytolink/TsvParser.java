@@ -86,7 +86,7 @@ public class TsvParser {
             {
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
                 caseDetail.setTitle("Specimen type");
-                caseDetail.setText(tsvMap.get("part_type_name"));
+                caseDetail.setText(tsvMap.get("part_type"));
                 caseDetail.setType("system");
                 caseDetail.setCtrltype("Text");
                 caseDetail.setEditable("True");
