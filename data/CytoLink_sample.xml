@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CWS>
+    <Case name="XX15-1000">
+        <CaseDetailsSet>
+            <CaseDetail title="Patient name" text="TEST, TEST" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+            <CaseDetail title="Date of birth" text="1999-01-01T00:00:00Z" type="system" ctrltype="Date" editable="True" mandatory="False"/>
+            <CaseDetail title="Specimen type" text="TEST" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+            <CaseDetail title="Referral reason" text="" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+            <CaseDetail title="Technologist" text="" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+            <CaseDetail title="Date" text="2015-01-01T10:35:00Z" type="system" ctrltype="Date" editable="True" mandatory="False"/>
+            <CaseDetail title="Case comment" text="" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+            <CaseDetail title="Result" text="" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+        </CaseDetailsSet>
+        <ScanSlide barcode="XX15-1000" templatename="BM">
+            <ScanDetailsSet>
+                <SlideDetail title="do not update" text="do not update" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+                <SlideDetail title="do not update" text="do not update" type="system" ctrltype="Text" editable="True" mandatory="False"/>
+            </ScanDetailsSet>
+        </ScanSlide>
+    </Case>
+</CWS>

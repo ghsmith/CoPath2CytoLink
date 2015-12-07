@@ -143,6 +143,26 @@ public class TsvParser {
                 caseDetail.setMandatory("False");
                 cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
             }
+            {
+                CWS.Case.ScanSlide scanSlide = of.createCWSCaseScanSlide();
+                scanSlide.setBarcode(tsvMap.get("specnum_formatted"));
+                scanSlide.setTemplatename("BM");
+                cws.getCase().setScanSlide(scanSlide);
+            }
+            {
+                CWS.Case.ScanSlide.ScanDetailsSet scanSlideDetailSet = of.createCWSCaseScanSlideScanDetailsSet();
+                cws.getCase().getScanSlide().setScanDetailsSet(scanSlideDetailSet);
+            }
+            {
+                CWS.Case.ScanSlide.ScanDetailsSet.SlideDetail slideDetail = of.createCWSCaseScanSlideScanDetailsSetSlideDetail();
+                slideDetail.setTitle("do not update");
+                slideDetail.setText("do not update");
+                slideDetail.setType("system");
+                slideDetail.setCtrltype("Text");
+                slideDetail.setEditable("True");
+                slideDetail.setMandatory("False");
+                cws.getCase().getScanSlide().getScanDetailsSet().getSlideDetail().add(slideDetail);
+            }
 
             File xmlFile = new File(cws.getCase().getName() + ".xml");
             OutputStream xmlOutputStream = new FileOutputStream(xmlFile);
