@@ -37,7 +37,8 @@ public class TsvParser {
 
     public static void main(String[] args) throws FileNotFoundException, IOException, PropertyException, JAXBException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         
         ObjectFactory of = new ObjectFactory();
 
