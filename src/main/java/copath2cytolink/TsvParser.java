@@ -13,11 +13,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -42,127 +44,159 @@ public class TsvParser {
         
         ObjectFactory of = new ObjectFactory();
 
-        int tsvFileLineCount;
-        {
-            FileReader tsvFileReader = new FileReader(args[0]);
-            LineNumberReader lnr = new LineNumberReader(tsvFileReader);
-            while(lnr.skip(Long.MAX_VALUE) > 0) {}
-            tsvFileLineCount = lnr.getLineNumber() - 1;
-            tsvFileReader.close();
-        }
-        
         ICsvMapReader mapReader = new CsvMapReader(new FileReader(args[0]), CsvPreference.TAB_PREFERENCE);
         final String[] header = mapReader.getHeader(true);
+        
+        // create uniqueness in column names
+        {
+            Map<String, Integer> columnNameMap = new HashMap<>();
+            for(int x = 0; x < header.length; x++) {
+                Integer columnNameCount = (columnNameMap.get(header[x]) == null ? 0 : columnNameMap.get(header[x]));
+                columnNameMap.put(header[x], columnNameCount + 1);
+                header[x] = header[x] + (columnNameCount == 0 ? "" : columnNameCount.toString());
+            }
+        }
+        
+        Map<String, CWS> caseMap = new HashMap<>();
+        Map<String, Set<String>> casePartNameMap = new HashMap<>();
         Map<String, String> tsvMap;
-        int x = 0;
         while((tsvMap = mapReader.read(header)) != null ) {
             
-            x++;
-            LOGGER.info("processing case " + tsvMap.get("specnum_formatted") + " (" + x + "/" + tsvFileLineCount + ")");
+            LOGGER.info("reading case " + tsvMap.get("specnum_formatted"));
+
+            CWS cws;
+            if(caseMap.get(tsvMap.get("specnum_formatted")) == null) {
+
+                cws = of.createCWS();
+                caseMap.put(tsvMap.get("specnum_formatted"), cws);
+
+                cws.setCase(of.createCWSCase());
+                cws.getCase().setName(tsvMap.get("specnum_formatted"));
+                cws.getCase().setCaseDetailsSet(of.createCWSCaseCaseDetailsSet());
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Patient name");
+                    caseDetail.setText(tsvMap.get("lastname") + ", " + tsvMap.get("firstname") + (tsvMap.get("middlename") != null ? " " + tsvMap.get("middlename") : ""));
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Text");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Date of birth");
+                    caseDetail.setText(sdf.format(new Date(tsvMap.get("date_of_birth"))));
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Date");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    casePartNameMap.put(tsvMap.get("specnum_formatted"), new HashSet<String>());
+                    casePartNameMap.get(tsvMap.get("specnum_formatted")).add(tsvMap.get("name"));
+                }
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Referral reason");
+                    caseDetail.setText(tsvMap.get("Text").replace("\n", "/"));
+                    if(caseDetail.getText() != null && caseDetail.getText().endsWith("/")) {
+                        caseDetail.setText(caseDetail.getText().substring(0, caseDetail.getText().length() - 1));
+                    }
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Text");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Technologist");
+                    caseDetail.setText("");
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Text");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Date");
+                    caseDetail.setText(sdf.format(new Date(tsvMap.get("order_date"))));
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Date");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Case comment");
+                    caseDetail.setText("");
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Text");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Result");
+                    caseDetail.setText("");
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Text");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                }
+                {
+                    CWS.Case.ScanSlide scanSlide = of.createCWSCaseScanSlide();
+                    scanSlide.setBarcode(tsvMap.get("specnum_formatted"));
+                    scanSlide.setTemplatename("BM");
+                    cws.getCase().setScanSlide(scanSlide);
+                }
+                {
+                    CWS.Case.ScanSlide.ScanDetailsSet scanSlideDetailSet = of.createCWSCaseScanSlideScanDetailsSet();
+                    cws.getCase().getScanSlide().setScanDetailsSet(scanSlideDetailSet);
+                }
+                {
+                    CWS.Case.ScanSlide.ScanDetailsSet.SlideDetail slideDetail = of.createCWSCaseScanSlideScanDetailsSetSlideDetail();
+                    slideDetail.setTitle("do not update");
+                    slideDetail.setText("do not update");
+                    slideDetail.setType("system");
+                    slideDetail.setCtrltype("Text");
+                    slideDetail.setEditable("True");
+                    slideDetail.setMandatory("False");
+                    cws.getCase().getScanSlide().getScanDetailsSet().getSlideDetail().add(slideDetail);
+                }
+
+            }
+            else {
+                
+                casePartNameMap.get(tsvMap.get("specnum_formatted")).add(tsvMap.get("name"));
+                
+            }
             
-            CWS cws = of.createCWS();
-            cws.setCase(of.createCWSCase());
-            cws.getCase().setName(tsvMap.get("specnum_formatted"));
-            cws.getCase().setCaseDetailsSet(of.createCWSCaseCaseDetailsSet());
+        }
+        
+        for(CWS cws : caseMap.values()) {
+            
+            LOGGER.info("writing case " + cws.getCase().getName());
+            
             {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Patient name");
-                caseDetail.setText(tsvMap.get("lastname") + ", " + tsvMap.get("firstname") + (tsvMap.get("middlename") != null ? " " + tsvMap.get("middlename") : ""));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Date of birth");
-                caseDetail.setText(sdf.format(new Date(tsvMap.get("date_of_birth"))));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Date");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
+                StringBuffer partNameSb = new StringBuffer();
+                for(String partName : casePartNameMap.get(cws.getCase().getName())) {
+                    partNameSb.append((partNameSb.length() == 0 ? "" : "/") + partName);
+                }
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
                 caseDetail.setTitle("Specimen type");
-                caseDetail.setText(tsvMap.get("part_type"));
+                caseDetail.setText(partNameSb.toString());
                 caseDetail.setType("system");
                 caseDetail.setCtrltype("Text");
                 caseDetail.setEditable("True");
                 caseDetail.setMandatory("False");
                 cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Referral reason");
-                caseDetail.setText("");
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Technologist");
-                caseDetail.setText("");
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Date");
-                caseDetail.setText(sdf.format(new Date(tsvMap.get("order_date"))));
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Date");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Case comment");
-                caseDetail.setText("");
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Result");
-                caseDetail.setText("");
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
-            }
-            {
-                CWS.Case.ScanSlide scanSlide = of.createCWSCaseScanSlide();
-                scanSlide.setBarcode(tsvMap.get("specnum_formatted"));
-                scanSlide.setTemplatename("BM");
-                cws.getCase().setScanSlide(scanSlide);
-            }
-            {
-                CWS.Case.ScanSlide.ScanDetailsSet scanSlideDetailSet = of.createCWSCaseScanSlideScanDetailsSet();
-                cws.getCase().getScanSlide().setScanDetailsSet(scanSlideDetailSet);
-            }
-            {
-                CWS.Case.ScanSlide.ScanDetailsSet.SlideDetail slideDetail = of.createCWSCaseScanSlideScanDetailsSetSlideDetail();
-                slideDetail.setTitle("do not update");
-                slideDetail.setText("do not update");
-                slideDetail.setType("system");
-                slideDetail.setCtrltype("Text");
-                slideDetail.setEditable("True");
-                slideDetail.setMandatory("False");
-                cws.getCase().getScanSlide().getScanDetailsSet().getSlideDetail().add(slideDetail);
             }
 
             File xmlFile = new File(cws.getCase().getName() + ".xml");
