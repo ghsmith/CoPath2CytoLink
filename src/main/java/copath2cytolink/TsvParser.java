@@ -15,9 +15,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -58,7 +60,7 @@ public class TsvParser {
         }
         
         Map<String, CWS> caseMap = new HashMap<>();
-        Map<String, Set<String>> casePartNameMap = new HashMap<>();
+        Map<String, List<String>> casePartNameMap = new HashMap<>();
         Map<String, String> tsvMap;
         while((tsvMap = mapReader.read(header)) != null ) {
             
@@ -94,7 +96,7 @@ public class TsvParser {
                     cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
                 }
                 {
-                    casePartNameMap.put(tsvMap.get("specnum_formatted"), new HashSet<String>());
+                    casePartNameMap.put(tsvMap.get("specnum_formatted"), new ArrayList<String>());
                     casePartNameMap.get(tsvMap.get("specnum_formatted")).add(tsvMap.get("name"));
                 }
                 {
@@ -135,7 +137,7 @@ public class TsvParser {
                     caseDetail.setTitle("Case comment");
                     caseDetail.setText("");
                     caseDetail.setType("system");
-                    caseDetail.setCtrltype("Text");
+                    caseDetail.setCtrltype("MultilineText");
                     caseDetail.setEditable("True");
                     caseDetail.setMandatory("False");
                     cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
@@ -145,7 +147,7 @@ public class TsvParser {
                     caseDetail.setTitle("Result");
                     caseDetail.setText("");
                     caseDetail.setType("system");
-                    caseDetail.setCtrltype("Text");
+                    caseDetail.setCtrltype("MultilineText");
                     caseDetail.setEditable("True");
                     caseDetail.setMandatory("False");
                     cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
@@ -188,6 +190,7 @@ public class TsvParser {
                 StringBuffer partNameSb = new StringBuffer();
                 for(String partName : casePartNameMap.get(cws.getCase().getName())) {
                     partNameSb.append((partNameSb.length() == 0 ? "" : "/") + partName);
+                    break; // currently only taking the first par name encountered
                 }
                 CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
                 caseDetail.setTitle("Specimen type");
