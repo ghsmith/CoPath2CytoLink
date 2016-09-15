@@ -102,7 +102,7 @@ public class TsvParser {
                 {
                     CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
                     caseDetail.setTitle("Referral reason");
-                    caseDetail.setText(tsvMap.get("Text").replace("\n", "/"));
+                    caseDetail.setText(tsvMap.get("Text") != null ? tsvMap.get("Text").replace("\n", "/") : "");
                     if(caseDetail.getText() != null && caseDetail.getText().endsWith("/")) {
                         caseDetail.setText(caseDetail.getText().substring(0, caseDetail.getText().length() - 1));
                     }
