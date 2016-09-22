@@ -18,10 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -103,8 +101,16 @@ public class TsvParser {
                     CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
                     caseDetail.setTitle("Referral reason");
                     caseDetail.setText(tsvMap.get("Text") != null ? tsvMap.get("Text").replace("\n", "/") : "");
+                    if(caseDetail.getText() != null && caseDetail.getText().startsWith("/")) {
+                        caseDetail.setText(caseDetail.getText().substring(1, caseDetail.getText().length() - 1));
+                    }
                     if(caseDetail.getText() != null && caseDetail.getText().endsWith("/")) {
                         caseDetail.setText(caseDetail.getText().substring(0, caseDetail.getText().length() - 1));
+                    }
+                    if(caseDetail.getText() != null) {
+                        while(caseDetail.getText().contains("//")) {
+                            caseDetail.setText(caseDetail.getText().replaceAll("//", "/"));
+                        }
                     }
                     caseDetail.setType("system");
                     caseDetail.setCtrltype("Text");
