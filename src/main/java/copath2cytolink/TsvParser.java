@@ -94,8 +94,16 @@ public class TsvParser {
                     cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
                 }
                 {
-                    casePartNameMap.put(tsvMap.get("specnum_formatted"), new ArrayList<String>());
-                    casePartNameMap.get(tsvMap.get("specnum_formatted")).add(tsvMap.get("name"));
+                    CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
+                    caseDetail.setTitle("Specimen Type"); // per Leica consultant, both words must start upper case
+                        //caseDetail.setText(partNameSb.toString());
+                        casePartNameMap.put(tsvMap.get("specnum_formatted"), new ArrayList<String>());
+                        casePartNameMap.get(tsvMap.get("specnum_formatted")).add(tsvMap.get("name"));
+                    caseDetail.setType("system");
+                    caseDetail.setCtrltype("Text");
+                    caseDetail.setEditable("True");
+                    caseDetail.setMandatory("False");
+                    cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
                 }
                 {
                     CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
@@ -198,14 +206,11 @@ public class TsvParser {
                     partNameSb.append((partNameSb.length() == 0 ? "" : "/") + partName);
                     break; // currently only taking the first par name encountered
                 }
-                CWS.Case.CaseDetailsSet.CaseDetail caseDetail = of.createCWSCaseCaseDetailsSetCaseDetail();
-                caseDetail.setTitle("Specimen type");
-                caseDetail.setText(partNameSb.toString());
-                caseDetail.setType("system");
-                caseDetail.setCtrltype("Text");
-                caseDetail.setEditable("True");
-                caseDetail.setMandatory("False");
-                cws.getCase().getCaseDetailsSet().getCaseDetail().add(caseDetail);
+                for(CWS.Case.CaseDetailsSet.CaseDetail caseDetail : cws.getCase().getCaseDetailsSet().getCaseDetail()) {
+                    if("Specimen Type".equals(caseDetail.getTitle())) {
+                        caseDetail.setText(partNameSb.toString());
+                    }
+                }
             }
 
             File xmlFile = new File(cws.getCase().getName() + ".xml");
